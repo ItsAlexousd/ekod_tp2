@@ -15,6 +15,16 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class TodoItem {
+  TodoItem({
+    required this.title,
+    this.completed = false,
+  });
+
+  final String title;
+  bool completed;
+}
+
 class AppView extends StatefulWidget {
   const AppView({super.key});
 
@@ -23,15 +33,46 @@ class AppView extends StatefulWidget {
 }
 
 class _AppViewState extends State<AppView> {
-  final items = <String>[];
+  final items = <TodoItem>[];
   final controller = TextEditingController();
 
-  void _addItem() {
-    final item = controller.text.trim();
-    if (item.isNotEmpty) {
-      if (!items.contains(item)) {
+  void _showAddItemDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Ajouter un item'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(labelText: 'Titre'),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Annuler'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                controller.clear();
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Ajouter'),
+              onPressed: () {
+                _addItem(controller.text.trim());
+                Navigator.of(context).pop();
+                controller.clear();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _addItem(String title) {
+    if (title.isNotEmpty) {
+      if (!items.any((item) => item.title == title)) {
         setState(() {
-          items.add(item);
+          items.add(TodoItem(title: title));
           controller.clear();
         });
       } else {
@@ -40,6 +81,12 @@ class _AppViewState extends State<AppView> {
     } else {
       _showSnackBar('Veuillez entrer un item.');
     }
+  }
+
+  void _toggleItem(int index) {
+    setState(() {
+      items[index].completed = !items[index].completed;
+    });
   }
 
   void _showSnackBar(String message) {
@@ -55,38 +102,34 @@ class _AppViewState extends State<AppView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Exercice 4'),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: TextField(
-              controller: controller,
-              decoration: const InputDecoration(
-                labelText: 'Ajouter un élément',
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: _addItem,
-            child: const Text('Ajouter'),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (_, index) {
-                return Card(
-                  child: ListTile(
-                    title: Text(items[index]),
+        appBar: AppBar(
+          title: const Text('Exercice 6'),
+        ),
+        body: ListView.builder(
+          itemCount: items.length,
+          itemBuilder: (_, index) {
+            final isCompleted = items[index].completed;
+            return Card(
+              child: CheckboxListTile(
+                title: Text(
+                  items[index].title,
+                  style: TextStyle(
+                    decoration: isCompleted
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none,
                   ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+                ),
+                value: isCompleted,
+                onChanged: (_) {
+                  _toggleItem(index);
+                },
+              ),
+            );
+          },
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _showAddItemDialog,
+          child: const Icon(Icons.add),
+        ));
   }
 }
