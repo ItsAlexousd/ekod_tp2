@@ -42,6 +42,12 @@ class _AppViewState extends State<AppView> {
     }
   }
 
+  void _removeItem(int index) {
+    setState(() {
+      items.removeAt(index);
+    });
+  }
+
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -80,6 +86,10 @@ class _AppViewState extends State<AppView> {
                 return Card(
                   child: ListTile(
                     title: Text(items[index]),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () => _removeItem(index),
+                    ),
                   ),
                 );
               },
