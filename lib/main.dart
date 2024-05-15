@@ -4,58 +4,88 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: AppView(),
+    );
+  }
 }
 
-class _MyAppState extends State<MyApp> {
-  int counter = 0;
+class AppView extends StatefulWidget {
+  const AppView({super.key});
 
-  void _incrementCounter() {
-    setState(() {
-      counter++;
-    });
+  @override
+  State<AppView> createState() => _AppViewState();
+}
+
+class _AppViewState extends State<AppView> {
+  final items = <String>[];
+  final controller = TextEditingController();
+
+  void _addItem() {
+    final item = controller.text.trim();
+    if (item.isNotEmpty) {
+      if (!items.contains(item)) {
+        setState(() {
+          items.add(item);
+          controller.clear();
+        });
+      } else {
+        _showSnackBar('Cet item existe déjà.');
+      }
+    } else {
+      _showSnackBar('Veuillez entrer un item.');
+    }
   }
 
-  void _decrementCounter() {
-    if (counter > 0) {
-      setState(() {
-        counter--;
-      });
-    }
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Exercice 3'),
-        ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Compteur: $counter'),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: _incrementCounter,
-                  child: const Text('+'),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: _decrementCounter,
-                  child: const Text('-'),
-                ),
-              ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Exercice 4'),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                labelText: 'Ajouter un élément',
+              ),
             ),
-          ],
-        ),
+          ),
+          ElevatedButton(
+            onPressed: _addItem,
+            child: const Text('Ajouter'),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (_, index) {
+                return Card(
+                  child: ListTile(
+                    title: Text(items[index]),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
