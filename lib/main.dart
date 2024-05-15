@@ -12,10 +12,29 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Exercice 1'),
+          title: const Text('Exercice 2'),
         ),
-        body: const Center(
-          child: Text('Hello World!'),
+        body: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Flutter'),
+                SizedBox(width: 10),
+                Text('est génial !'),
+              ],
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Apprendre'),
+                SizedBox(width: 10),
+                Text('Flutter'),
+              ],
+            ),
+          ],
         ),
       ),
     );
